@@ -2,8 +2,31 @@ document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements
     const btnRefresh = document.getElementById('btn-refresh');
     const btnExportCSV = document.getElementById('btn-export-csv');
+    const btnThemeToggle = document.getElementById('btn-theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
     const spinnerIcon = document.getElementById('spinner-icon');
     const searchInput = document.getElementById('search-input');
+
+    // Load saved theme
+    if (localStorage.getItem('theme') === 'light') {
+        document.body.classList.add('light-mode');
+        themeIcon.className = 'fa-solid fa-moon';
+    } else {
+        themeIcon.className = 'fa-solid fa-sun';
+    }
+
+    // Toggle Theme Function
+    function toggleTheme() {
+        if (document.body.classList.contains('light-mode')) {
+            document.body.classList.remove('light-mode');
+            themeIcon.className = 'fa-solid fa-sun';
+            localStorage.setItem('theme', 'dark');
+        } else {
+            document.body.classList.add('light-mode');
+            themeIcon.className = 'fa-solid fa-moon';
+            localStorage.setItem('theme', 'light');
+        }
+    }
     const filterTabs = document.querySelectorAll('.filter-tab');
     const feedContainer = document.getElementById('releases-feed');
     const loadingState = document.getElementById('loading-state');
@@ -347,6 +370,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btnRefresh.addEventListener('click', loadReleases);
     btnRetry.addEventListener('click', loadReleases);
     btnExportCSV.addEventListener('click', exportToCSV);
+    btnThemeToggle.addEventListener('click', toggleTheme);
     
     searchInput.addEventListener('input', renderFeed);
     
