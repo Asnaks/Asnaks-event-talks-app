@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BigQuery Release Notes Explorer</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Background decorative elements -->
+        <div class="glow-sphere sphere-1"></div>
+        <div class="glow-sphere sphere-2"></div>
+
+        <!-- Main Header -->
+        <header class="app-header">
+            <div class="header-logo">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-database"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>BigQuery</h1>
+                    <span>Release Notes Hub</span>
+                </div>
+            </div>
+            
+            <div class="header-actions">
+                <button id="btn-refresh" class="btn-primary">
+                    <i id="spinner-icon" class="fa-solid fa-rotate-right"></i>
+                    <span>Refresh Feed</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Filters Section -->
+        <section class="filters-container">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="search-input" placeholder="Search updates...">
+            </div>
+            <div class="filter-tabs">
+                <button class="filter-tab active" data-type="all">All Updates</button>
+                <button class="filter-tab" data-type="feature"><span class="badge badge-feature"></span> Features</button>
+                <button class="filter-tab" data-type="issue"><span class="badge badge-issue"></span> Issues</button>
+                <button class="filter-tab" data-type="deprecation"><span class="badge badge-deprecation"></span> Deprecations</button>
+            </div>
+        </section>
+
+        <!-- Feed Container -->
+        <main class="feed-main">
+            <div id="loading-state" class="state-container hidden">
+                <div class="pulse-loader"></div>
+                <p>Fetching latest release notes...</p>
+            </div>
+
+            <div id="error-state" class="state-container hidden">
+                <i class="fa-solid fa-circle-exclamation text-danger"></i>
+                <h3>Failed to load release notes</h3>
+                <p id="error-message">An unexpected error occurred.</p>
+                <button id="btn-retry" class="btn-secondary">Try Again</button>
+            </div>
+
+            <div id="empty-state" class="state-container hidden">
+                <i class="fa-solid fa-folder-open text-muted"></i>
+                <h3>No updates found</h3>
+                <p>Try refining your search or filter choices.</p>
+            </div>
+
+            <div id="releases-feed" class="releases-feed">
+                <!-- Dynamically populated -->
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>Made for Google Cloud & BigQuery Developers &copy; 2026</p>
+        </footer>
+    </div>
+
+    <!-- Tweet Composer Modal -->
+    <div id="tweet-modal" class="modal-overlay hidden">
+        <div class="modal-content glassmorphism">
+            <div class="modal-header">
+                <h3><i class="fa-brands fa-x-twitter"></i> Tweet Composer</h3>
+                <button id="btn-close-modal" class="btn-close"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-instructions">Customize your post before sharing it on X (formerly Twitter):</p>
+                <div class="composer-container">
+                    <textarea id="tweet-textarea" rows="5" maxlength="280" placeholder="What's happening?"></textarea>
+                    <div class="composer-footer">
+                        <span id="char-counter">280</span>
+                        <button id="btn-share-tweet" class="btn-tweet">
+                            <i class="fa-brands fa-x-twitter"></i> Post to X
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
