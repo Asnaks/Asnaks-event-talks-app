@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     // DOM Elements
     const btnRefresh = document.getElementById('btn-refresh');
+    const btnExportCSV = document.getElementById('btn-export-csv');
     const spinnerIcon = document.getElementById('spinner-icon');
     const searchInput = document.getElementById('search-input');
     const filterTabs = document.querySelectorAll('.filter-tab');
@@ -162,6 +163,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     tweetBtn.innerHTML = '<i class="fa-brands fa-x-twitter"></i>';
                     tweetBtn.addEventListener('click', () => openTweetComposer(item, dayGroup.date));
                     
+                    // Copy to Clipboard Button
+                    const copyBtn = document.createElement('button');
+                    copyBtn.className = 'btn-action';
+                    copyBtn.title = 'Copy update to clipboard';
+                    copyBtn.innerHTML = '<i class="fa-regular fa-copy"></i>';
+                    copyBtn.addEventListener('click', () => copyToClipboard(item, copyBtn));
+                    
                     // Link Button
                     const linkBtn = document.createElement('a');
                     linkBtn.className = 'btn-action';
@@ -171,6 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     linkBtn.innerHTML = '<i class="fa-solid fa-arrow-up-right-from-square"></i>';
 
                     actions.appendChild(tweetBtn);
+                    actions.appendChild(copyBtn);
                     actions.appendChild(linkBtn);
                     
                     header.appendChild(tag);
@@ -271,9 +280,73 @@ document.addEventListener('DOMContentLoaded', () => {
         closeModal();
     }
 
+    // Copy to clipboard helper
+    function copyToClipboard(item, btn) {
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = item.content;
+        const plainText = tempDiv.textContent.replace(/\s+/g, ' ').trim();
+        
+        navigator.clipboard.writeText(plainText).then(() => {
+            // Success visual indicator
+            btn.innerHTML = '<i class="fa-solid fa-check" style="color: var(--color-feature);"></i>';
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fa-regular fa-copy"></i>';
+            }, 2000);
+        }).catch(err => {
+            console.error('Failed to copy text: ', err);
+        });
+    }
+
+    // Export loaded/filtered releases to CSV
+    function exportToCSV() {
+        const query = searchInput.value.toLowerCase().trim();
+        const csvRows = [];
+        
+        // CSV Header
+        csvRows.push(['Date', 'Type', 'Content'].map(h => `"${h.replace(/"/g, '""')}"`).join(','));
+        
+        allReleases.forEach(dayGroup => {
+            dayGroup.items.forEach(item => {
+                const typeMatches = (activeTypeFilter === 'all' || item.type === activeTypeFilter);
+                
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = item.content;
+                const textContent = tempDiv.textContent;
+                
+                const searchMatches = (!query || textContent.toLowerCase().includes(query));
+                
+                if (typeMatches && searchMatches) {
+                    const cleanText = textContent.replace(/\s+/g, ' ').trim();
+                    const row = [
+                        dayGroup.date,
+                        item.type.toUpperCase(),
+                        cleanText
+                    ].map(val => `"${val.replace(/"/g, '""')}"`).join(',');
+                    csvRows.push(row);
+                }
+            });
+        });
+
+        if (csvRows.length <= 1) {
+            alert('No records found to export.');
+            return;
+        }
+
+        const csvString = csvRows.join("\n");
+        const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", "bigquery_release_notes.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
     // Event Listeners
     btnRefresh.addEventListener('click', loadReleases);
     btnRetry.addEventListener('click', loadReleases);
+    btnExportCSV.addEventListener('click', exportToCSV);
     
     searchInput.addEventListener('input', renderFeed);
     
